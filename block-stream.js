@@ -121,6 +121,7 @@ BlockStream.prototype._emitChunk = function (flush) {
         // output the entire current chunk.
         // toss it away
         outHas -= curHas
+        outOffset += curHas
         this._buffer.shift()
         this._offset = 0
       }
@@ -129,6 +130,7 @@ BlockStream.prototype._emitChunk = function (flush) {
     assert(out.length === this._chunkSize)
     debug("emitting data", out)
     this.emit("data", out)
+    out = null
   }
 
   // now either drained or ended
