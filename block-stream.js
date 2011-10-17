@@ -9,15 +9,19 @@ var Stream = require("stream").Stream
   , assert = require("assert").ok
   , debug = process.env.DEBUG ? console.error : function () {}
 
-function BlockStream (size) {
+function BlockStream (size, opt) {
   this.writable = this.readable = true
+  this._opt = opt || {}
   this._chunkSize = size || 512
   this._offset = 0
   this._buffer = []
   this._bufferLength = 0
-  this._zeroes = new Buffer(this._chunkSize)
-  for (var i = 0; i < this._chunkSize; i ++) {
-    this._zeroes[i] = 0
+  if (this._opt.nopad) this._zeroes = false
+  else {
+    this._zeroes = new Buffer(this._chunkSize)
+    for (var i = 0; i < this._chunkSize; i ++) {
+      this._zeroes[i] = 0
+    }
   }
 }
 
@@ -51,7 +55,7 @@ BlockStream.prototype.pause = function () {
 BlockStream.prototype.resume = function () {
   this._paused = false
   this.emit("resume")
-  return this.write()
+  return this._emitChunk()
 }
 
 BlockStream.prototype.end = function (chunk, cb) {
@@ -73,7 +77,7 @@ BlockStream.prototype._emitChunk = function (flush) {
   this._emitting = true
 
   // emit a <chunkSize> chunk
-  if (flush) {
+  if (flush && this._zeroes) {
     // push a chunk of zeroes
     var padBytes = (this._bufferLength % this._chunkSize)
     if (padBytes !== 0) padBytes = this._chunkSize - padBytes
@@ -133,8 +137,39 @@ BlockStream.prototype._emitChunk = function (flush) {
     out = null
   }
 
+  // if flushing, and not using null-padding, then need to emit the last
+  // chunk(s) sitting in the queue.  We know that it's not enough to
+  // fill up a whole block, because otherwise it would have been emitted
+  // above, but there may be some offset.
+  var l = this._buffer.length
+  if (flush && !this._zeroes && l) {
+    if (l === 1) {
+      if (this._offset) {
+        this.emit("data", this._buffer[0].slice(this._offset))
+      } else {
+        this.emit("data", this._buffer[0])
+      }
+    } else {
+      var outHas = this._bufferLength
+        , out = new Buffer(outHas)
+        , outOffset = 0
+      for (var i = 0; i < l; i ++) {
+        var cur = this._buffer[i]
+          , curHas = cur.length - this._offset
+        cur.copy(out, outOffset, this._offset)
+        this._offset = 0
+        outOffset += curHas
+        this._bufferLength -= curHas
+      }
+      this.emit("data", out)
+    }
+    this._buffer.length = 0
+    this._bufferLength = 0
+    this._offset = 0
+  }
+
   // now either drained or ended
-  debug("either draining, or ending")
+  debug("either draining, or ended")
   debug(this._bufferLength, this._buffer.length, this._ended)
   // means that we've flushed out all that we can so far.
   if (this._needDrain) {
