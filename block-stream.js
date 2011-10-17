@@ -89,13 +89,14 @@ BlockStream.prototype._emitChunk = function (flush) {
     }
   }
 
+  var bufferIndex = 0
   while (this._bufferLength >= this._chunkSize) {
     var out
       , outOffset = 0
       , outHas = this._chunkSize
     while (outHas > 0) {
       debug("data emit loop")
-      var cur = this._buffer[0]
+      var cur = this._buffer[bufferIndex]
         , curHas = cur.length - this._offset
       debug("cur=", cur)
       debug("curHas=%j", curHas)
@@ -126,16 +127,20 @@ BlockStream.prototype._emitChunk = function (flush) {
         // toss it away
         outHas -= curHas
         outOffset += curHas
-        this._buffer.shift()
+        bufferIndex ++
         this._offset = 0
       }
     }
+
     this._bufferLength -= this._chunkSize
     assert(out.length === this._chunkSize)
     debug("emitting data", out)
     this.emit("data", out)
     out = null
   }
+
+  // whatever is left, it's not enough to fill up a block.
+  this._buffer = this._buffer.slice(bufferIndex)
 
   // if flushing, and not using null-padding, then need to emit the last
   // chunk(s) sitting in the queue.  We know that it's not enough to
@@ -163,6 +168,7 @@ BlockStream.prototype._emitChunk = function (flush) {
       }
       this.emit("data", out)
     }
+    // truncate
     this._buffer.length = 0
     this._bufferLength = 0
     this._offset = 0
