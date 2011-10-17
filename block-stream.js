@@ -86,17 +86,32 @@ BlockStream.prototype._emitChunk = function (flush) {
   }
 
   while (this._bufferLength >= this._chunkSize) {
-    var out = new Buffer(this._chunkSize)
+    var out
       , outOffset = 0
-      , outHas = out.length
+      , outHas = this._chunkSize
     while (outHas > 0) {
       debug("data emit loop")
       var cur = this._buffer[0]
         , curHas = cur.length - this._offset
       debug("cur=", cur)
       debug("curHas=%j", curHas)
-      cur.copy(out, outOffset,
-               this._offset, this._offset + Math.min(curHas, outHas))
+      // If it's not big enough to fill the whole thing, then we'll need
+      // to copy multiple buffers into one.  However, if it is big enough,
+      // then just slice out the part we want, to save unnecessary copying.
+      // Also, need to copy if we've already done some copying, since buffers
+      // can't be joined like cons strings.
+      if (out || curHas < outHas) {
+        out = out || new Buffer(this._chunkSize)
+        cur.copy(out, outOffset,
+                 this._offset, this._offset + Math.min(curHas, outHas))
+      } else if (cur.length === outHas && this._offset === 0) {
+        // shortcut -- cur is exactly long enough, and no offset.
+        out = cur
+      } else {
+        // slice out the piece of cur that we need.
+        out = cur.slice(this._offset, this._offset + outHas)
+      }
+
       if (curHas > outHas) {
         // means that the current buffer couldn't be completely output
         // update this._offset to reflect how much WAS written
