@@ -184,8 +184,9 @@ BlockStream.prototype._emitChunk = function (flush) {
     this.emit("drain")
   }
 
-  if ((this._bufferLength === 0) && this._ended) {
-    debug("emitting end")
+  if ((this._bufferLength === 0) && this._ended && !this._endEmitted) {
+    console.error("emitting end")
+    this._endEmitted = true
     this.emit("end")
   }
 
