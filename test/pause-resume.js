@@ -16,9 +16,11 @@ writeSizes.forEach(function (writeSize) {
     var actualChunks = 0
     var actualBytes = 0
     var timeouts = 0
+    var paused = false
 
     f.on("data", function (c) {
       timeouts ++
+      t.notOk(paused, "should not be paused when emitting data")
 
       actualChunks ++
       actualBytes += c.length
@@ -26,8 +28,9 @@ writeSizes.forEach(function (writeSize) {
       // make sure that no data gets corrupted, and basic sanity
       var before = c.toString()
       // simulate a slow write operation
+      paused = true
       f.pause()
-      setTimeout(function () {
+      process.nextTick(function () {
         var after = c.toString()
         t.equal(after, before, "should not change data")
 
@@ -35,9 +38,10 @@ writeSizes.forEach(function (writeSize) {
         for (var i = 0; i < c.length; i ++) {
           c[i] = "x".charCodeAt(0)
         }
+        paused = false
         f.resume()
         timeouts --
-      }, 100)
+      })
     })
 
     f.on("end", function () {
