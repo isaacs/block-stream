@@ -19,5 +19,6 @@
   },
   "scripts": {
     "test": "tap test/"
-  }
+  },
+  "license":"BSD"
 }
