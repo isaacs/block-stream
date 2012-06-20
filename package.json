@@ -8,7 +8,7 @@
     "url": "git://github.com/isaacs/block-stream.git"
   },
   "engines": {
-    "node": "0.4 || ~0.5.8 || 0.6 || 0.7"
+    "node": "0.4 || ~0.5.8 || 0.6 || 0.7 || 0.8"
   },
   "main": "block-stream.js",
   "dependencies": {
