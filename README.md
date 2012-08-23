@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/isaacs/block-stream.png)](http://travis-ci.org/isaacs/block-stream)
 # block-stream
 
 A stream of blocks.
