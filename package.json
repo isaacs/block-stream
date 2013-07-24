@@ -12,7 +12,7 @@
   },
   "main": "block-stream.js",
   "dependencies": {
-    "inherits": "~1.0.0"
+    "inherits": "~2.0.0"
   },
   "devDependencies": {
     "tap": "0.x"
@@ -20,5 +20,5 @@
   "scripts": {
     "test": "tap test/"
   },
-  "license":"BSD"
+  "license": "BSD"
 }
