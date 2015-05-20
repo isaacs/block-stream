@@ -20,5 +20,5 @@
   "scripts": {
     "test": "tap test/"
   },
-  "license": "BSD"
+  "license": "ISC"
 }
