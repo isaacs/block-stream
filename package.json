@@ -15,10 +15,10 @@
     "inherits": "~2.0.0"
   },
   "devDependencies": {
-    "tap": "0.x"
+    "tap": "^1.2.0"
   },
   "scripts": {
-    "test": "tap test/"
+    "test": "tap test/*.js --cov"
   },
   "license": "ISC"
 }
