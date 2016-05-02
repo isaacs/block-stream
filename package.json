@@ -20,5 +20,8 @@
   "scripts": {
     "test": "tap test/*.js --cov"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "files": [
+    "block-stream.js"
+  ]
 }
