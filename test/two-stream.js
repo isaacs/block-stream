@@ -1,5 +1,4 @@
-var log = console.log,
-    assert = require( 'assert' ),
+var t = require('tap'),
     BlockStream = require("../block-stream.js"),
     isize = 0, tsize = 0, fsize = 0, psize = 0, i = 0,
     filter = null, paper = null, stack = null,
@@ -25,7 +24,7 @@ var fcounter = 0;
 filter.on( 'data', function (c) {
   // verify that they're not null-padded
   for (var i = 0; i < c.length; i ++) {
-    assert.strictEqual(c[i], "x".charCodeAt(0))
+    t.strictEqual(c[i], "x".charCodeAt(0))
   }
     ++fcounter;
 } );
@@ -34,7 +33,7 @@ var pcounter = 0;
 paper.on( 'data', function (c) {
   // verify that they're not null-padded
   for (var i = 0; i < c.length; i ++) {
-    assert.strictEqual(c[i], "x".charCodeAt(0))
+    t.strictEqual(c[i], "x".charCodeAt(0))
   }
     ++pcounter;
 } );
@@ -42,13 +41,11 @@ paper.on( 'data', function (c) {
 filter.pipe( paper );
 
 filter.on( 'end', function () {
-  log("fcounter: %s === %s", fcounter, fexpected)
-    assert.strictEqual( fcounter, fexpected );
+    t.strictEqual( fcounter, fexpected );
 } );
 
 paper.on( 'end', function () {
-  log("pcounter: %s === %s", pcounter, pexpected);
-    assert.strictEqual( pcounter, pexpected );
+    t.strictEqual( pcounter, pexpected );
 } );
 
 
