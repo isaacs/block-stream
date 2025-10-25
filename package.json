@@ -20,7 +20,7 @@
   "scripts": {
     "test": "tap test/*.js --cov"
   },
-  "license": "ISC",
+  "license": "BlueOak-1.0.0",
   "files": [
     "block-stream.js"
   ]
