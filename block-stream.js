@@ -151,7 +151,7 @@ BlockStream.prototype._emitChunk = function (flush) {
   this._buffer = this._buffer.slice(bufferIndex)
   if (this._paused) {
     // debug("    BS paused, leaving", this._bufferLength)
-    this._needsDrain = true
+    this._needDrain = true
     this._emitting = false
     return
   }
