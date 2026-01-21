@@ -60,7 +60,7 @@ BlockStream.prototype.resume = function () {
 
 BlockStream.prototype.end = function (chunk) {
   // debug("end", chunk)
-  if (typeof chunk === "function") cb = chunk, chunk = null
+  if (typeof chunk === "function") chunk = null
   if (chunk) this.write(chunk)
   this._ended = true
   this.flush()
