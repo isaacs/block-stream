@@ -15,7 +15,7 @@
     "inherits": "~2.0.0"
   },
   "devDependencies": {
-    "tap": "^5.7.1"
+    "tap": "^7.0.0"
   },
   "scripts": {
     "test": "tap test/*.js --cov"
